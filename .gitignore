@@ -1,0 +1,23 @@
+# Python basics
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+
+# Environment variables
+.env
+
+# Flask
+instance/
+.webassets-cache
+
+# IDE settings (if you use them)
+.vscode/
+.idea/
+
+# Testing
+.coverage
+htmlcov/
