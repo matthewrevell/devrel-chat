@@ -1,12 +1,10 @@
-<section class="py-2 antialiased bg-gray-800 md:py-8 pt-4 mx-auto max-w-screen-md px-4">
+<section class="py-2 antialiased bg-gray-800 md:py-4 pt-2 mx-auto max-w-screen-md px-4">
     <div class="space-y-2 rounded-lg border p-6 shadow-sm border-gray-400 bg-gray-800">
-      <div class="flex items-center gap-3">
-        <p class="text-base font-semibold text-white hover:underline">DevRelCon says...</p>
-      </div>
-      <div class="text-base text-gray-200 prose prose-invert">
-        <!-- Render the markdown content -->
-        {{ answer | safe }}
-      </div>
+        <div class="flex items-center gap-3">
+            <p class="text-base font-semibold text-white hover:underline">DevRelCon says...</p>
+        </div>
+        <div class="prose prose-invert prose-ol:list-decimal prose-ul:list-disc prose-li:marker:text-gray-200 max-w-none text-base text-gray-200">
+            {{ answer | safe }}
+        </div>
     </div>
-  </section>
-  
+</section>
