@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from pinecone import Pinecone
 from pinecone_plugins.assistant.models.chat import Message
 from dotenv import load_dotenv
@@ -42,9 +42,8 @@ def home():
         msg = Message(content="Please give me some tips on measuring developer relations success.")
         resp = assistant.chat(messages=[msg])
 
-        
         print(resp)
-        return("Waiting for an answer!")
+        return render_template('index.html', message=resp['message']['content'])
 
     except AttributeError:
         logger.error("Unable to access assistant properties")
