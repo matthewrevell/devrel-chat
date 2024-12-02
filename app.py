@@ -4,6 +4,9 @@ from pinecone_plugins.assistant.models.chat import Message
 from dotenv import load_dotenv
 import os
 import logging
+import markdown2
+
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -49,9 +52,12 @@ def home():
             
             # Extract answer from response
             answer = resp['message']['content']
-            print(answer)
             
-            return render_template('index.html', answer=answer)
+            html_content = markdown2.markdown(answer, extras=['break-on-newline', 'cuddled-lists'])
+
+            print(html_content)            
+            return render_template('index.html', answer=html_content)
+        
 
         except Exception as e:
             logger.error(f"Error processing question: {str(e)}")
