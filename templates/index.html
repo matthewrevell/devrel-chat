@@ -1,7 +1,9 @@
 {% extends './layouts/base.html' %}
 
 {% block content %}
-
-    <p>{{ message }}</p>
-
+    {% include './components/ask-form.html' %}
+    
+    {% if answer %}
+        {% include './components/answer-section.html' %}
+    {% endif %}
 {% endblock %}

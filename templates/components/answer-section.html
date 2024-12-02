@@ -1,0 +1,13 @@
+<section class="py-2 antialiased bg-gray-800 md:py-8 pt-4 mx-auto max-w-screen-md">
+    <div class="space-y-6 sm:space-y-8">
+        <div class="space-y-3 rounded-lg border p-6 shadow-sm border-gray-400 bg-gray-800">
+          <div class="flex items-center gap-3">
+            <p class="text-base font-semibold text-white hover:underline">DevRelCon says...</p>
+          </div>
+          <div class="text-base font-normal text-gray-400 whitespace-pre-line space-y-4 [&>ul]:list-disc [&>ul]:ml-4 [&>ol]:list-decimal [&>ol]:ml-4">
+            {{ answer | safe }}
+        </div>
+          
+        </div>
+    </div>
+</section>
