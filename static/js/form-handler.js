@@ -45,6 +45,28 @@ document.addEventListener('DOMContentLoaded', function() {
         progressBar.classList.add('hidden');
     }
     
+    // Function to handle form submission
+    function handleSubmit(e) {
+        if (!textarea.value.trim()) {
+            e.preventDefault();
+            errorMessage.classList.remove('hidden');
+            
+            setTimeout(() => {
+                errorMessage.classList.add('hidden');
+            }, 3000);
+            
+            return false;
+        }
+
+        
+        
+        // Show progress bar and submit form
+        progressBar.classList.remove('hidden');
+        sessionStorage.setItem('formSubmitted', 'true');
+        return true;
+    }
+    
+    // Handle Enter key
     textarea.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
             if (e.shiftKey) {
@@ -52,21 +74,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             e.preventDefault();
-            
-            if (!textarea.value.trim()) {
-                errorMessage.classList.remove('hidden');
-                
-                setTimeout(() => {
-                    errorMessage.classList.add('hidden');
-                }, 3000);
-                
-                return;
+            if (handleSubmit(e)) {
+                form.submit();
             }
-            
-            // Show progress bar and submit form
-            progressBar.classList.remove('hidden');
-            sessionStorage.setItem('formSubmitted', 'true');
-            form.submit();
         }
+    });
+    
+    // Handle form submit (button click)
+    form.addEventListener('submit', function(e) {
+        handleSubmit(e);
     });
 });

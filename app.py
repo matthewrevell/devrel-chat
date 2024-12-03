@@ -41,6 +41,7 @@ def home():
             print(f"prefix: {experience_prefix}")
 
             full_question = f"{prompt_prefix} {experience_prefix} {question}"
+            print(f"Full question: {full_question}")
             
             # Get the assistant
             try:
