@@ -12,8 +12,8 @@ logger = logging.getLogger(__name__)
 
 load_dotenv()
 pineconeAPIKey = os.getenv('PINECONE_API_KEY')
-if not pineconeAPIKey:
-    raise ValueError("PINECONE_API_KEY not found in environment variables")
+if not pineconeAPIKey or pineconeAPIKey.strip() == '':
+    raise ValueError("PINECONE_API_KEY not found or empty in environment variables")
 
 app = Flask(__name__)
 
@@ -32,15 +32,22 @@ except FileNotFoundError:
 def home():
     if request.method == 'POST':
         try:
-            question = request.form['message']
+            question = request.form.get('message')
             experience_level = request.form.get('experience_level', 'beginner')
+            speaker = request.form.get('speaker')
+            if speaker:
+                speaker = speaker.lower().replace(' ', '-')
 
-            experience_prefix = prompts.get(experience_level, prompts['beginner'])
+            print("Speaker: ", speaker)
+
+            experience_prefix = prompts.get(experience_level)
             prompt_prefix = prompts.get('prefix')
-            print(f"Experience level: {experience_level}")
-            print(f"prefix: {experience_prefix}")
+        
 
-            full_question = f"{prompt_prefix} {experience_prefix} {question}"
+            if experience_prefix:
+                full_question = f"{prompt_prefix} {experience_prefix} {question}"
+            else:
+                full_question = f"{prompt_prefix} {question}"
             print(f"Full question: {full_question}")
             
             # Get the assistant
@@ -73,10 +80,15 @@ def home():
 
             # Create message and get response
             msg = Message(content=full_question)
-            resp = assistant.chat(messages=[msg])
+            if speaker:
+                resp = assistant.chat(messages=[msg], filter={"author": speaker})
+            else:
+                resp = assistant.chat(messages=[msg])
             
             # Extract answer from response
             answer = resp['message']['content']
+
+            print("Answer: ", answer)
             
             html_content = markdown2.markdown(
                 answer, 
