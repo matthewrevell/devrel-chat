@@ -4,7 +4,7 @@
         <p class="mb-8 lg:mb-8 font-light text-center text-gray-400 sm:text-xl">Ask a question about developer relations and get an answer based on the expertise of DevRelCon speakers from more than 20 events.</p>
         <form action="{{ url_for('home') }}" method="POST" class="space-y-6">
             <div class="sm:col-span-2">
-                <label for="message" class="block mb-2 text-sm font-mediumtext-gray-400">Your question</label>
+                <label for="message" class="block mb-2 text-sm font-mediumtext-gray-400">Ask your question <span class="text-gray-400">(Hit <i>Enter</i> to submit your question, <i>Shift + Enter</i> for a new line.)</span></label>
                 <textarea 
                     id="message" 
                     name="message" 
@@ -13,10 +13,14 @@
                     placeholder="What do you want to know?"
                     required
                 ></textarea>
-                <p class="text-sm text-gray-400 pt-2">Hit <i>Enter</i> to submit your question, <i>Shift + Enter</i> for a new line.</p>
+
+                {% include './components/progress.html' %}
+
+
 
             </div>
             <button type="submit" class="py-3 px-5 text-sm font-medium text-center text-white rounded-lg bg-primary-700 sm:w-fit hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Submit your question</button>
+
         </form>
     </div>
 </section>

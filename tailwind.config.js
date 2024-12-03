@@ -58,6 +58,16 @@ module.exports = {
           'Segoe UI Symbol', 
           'Noto Color Emoji'
         ]
+      },
+      keyframes: {
+        progressBar: {
+          '0%': { width: '0%' },
+          '50%': { width: '100%' },
+          '100%': { width: '0%' }
+        }
+      },
+      animation: {
+        'progressBar': 'progressBar 8s ease-in-out infinite',
       }
     }
   },
