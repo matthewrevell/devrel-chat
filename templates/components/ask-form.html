@@ -1,26 +1,78 @@
 <section class="bg-gray-800">
-    <div class="py-4 lg:pt-8 lg:pb-2 px-4 mx-auto max-w-screen-md">
+    <div class="py-4 lg:pt-8 lg:pb-2 px-4 mx-auto max-w-screen-xl">
         <h2 class="mb-4 text-4xl tracking-tight font-extrabold text-center text-white">Ask a question about developer relations</h2>
         <p class="mb-8 lg:mb-8 font-light text-center text-gray-400 sm:text-xl">Ask a question about developer relations and get an answer based on the expertise of DevRelCon speakers from more than 20 events.</p>
-        <form action="{{ url_for('home') }}" method="POST" class="space-y-6">
-            <div class="sm:col-span-2">
-                <label for="message" class="block mb-2 text-sm font-mediumtext-gray-400">Ask your question <span class="text-gray-400">(Hit <i>Enter</i> to submit your question, <i>Shift + Enter</i> for a new line.)</span></label>
-                <textarea 
-                    id="message" 
-                    name="message" 
-                    rows="6" 
-                    class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg shadow-sm border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" 
-                    placeholder="What do you want to know?"
-                    required
-                ></textarea>
+        
+        <!-- Container for form and buttons -->
+        <div class="flex flex-col lg:flex-row gap-8 lg:gap-12">
+            <!-- Form - appears below buttons on mobile, to the left on desktop -->
+            <form action="{{ url_for('home') }}" method="POST" class="space-y-6 lg:order-1 flex-1">
+                <div class="sm:col-span-2">
+                    <label for="message" class="block mb-2 text-sm font-medium text-gray-400">Ask your question <span class="text-gray-400">(Hit <i>Enter</i> to submit your question, <i>Shift + Enter</i> for a new line.)</span></label>
+                    <textarea 
+                        rows="12"
+                        id="message" 
+                        name="message" 
+                        class="block p-2.5 w-full text-sm text-white bg-gray-700 rounded-lg shadow-sm border border-gray-600 focus:ring-primary-500 focus:border-primary-500" 
+                        placeholder="What do you want to know?"
+                        required
+                    ></textarea>
 
-                {% include './components/progress.html' %}
+                    {% include './components/progress.html' %}
+                </div>
+                <button type="submit" class="py-3 px-5 text-sm font-medium text-center text-white rounded-lg bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-800">Submit your question</button>
+            </form>
 
-
-
+            <!-- Buttons stack - appears above on mobile, to the right on desktop -->
+            <div class="flex flex-col gap-4 lg:w-56 lg:order-2 lg:mt-8">
+                <h3 class="text-sm font-semibold text-gray-400 text-center">Choose your experience level</h3>
+                <button onclick="selectExperience(this)" data-value="beginner" class="experience-button relative flex items-center justify-center p-0.5 overflow-hidden text-sm font-medium text-white rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 focus:ring-4 focus:outline-none focus:ring-pink-800 w-full">
+                    <span class="relative w-full px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 rounded-md group-hover:bg-opacity-0">
+                    Beginner
+                    </span>
+                </button>
+                <button onclick="selectExperience(this)" data-value="intermediate" class="experience-button relative flex items-center justify-center p-0.5 overflow-hidden text-sm font-medium text-white rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 focus:ring-4 focus:outline-none focus:ring-pink-800 w-full">
+                    <span class="relative w-full px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 rounded-md group-hover:bg-opacity-0">
+                    Intermediate
+                    </span>
+                </button>
+                <button onclick="selectExperience(this)" data-value="experienced" class="experience-button relative flex items-center justify-center p-0.5 overflow-hidden text-sm font-medium text-white rounded-lg group bg-gradient-to-br from-pink-500 to-orange-400 group-hover:from-pink-500 group-hover:to-orange-400 focus:ring-4 focus:outline-none focus:ring-pink-800 w-full">
+                    <span class="relative w-full px-5 py-2.5 transition-all ease-in duration-75 bg-gray-900 rounded-md group-hover:bg-opacity-0">
+                    Experienced
+                    </span>
+                </button>
+                <input type="hidden" name="experience_level" id="experience_level">
             </div>
-            <button type="submit" class="py-3 px-5 text-sm font-medium text-center text-white rounded-lg bg-primary-700 sm:w-fit hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">Submit your question</button>
-
-        </form>
+        </div>
     </div>
+
+    <script>
+        let currentlySelected = null;
+
+        function selectExperience(button) {
+            if (currentlySelected === button) {
+                // Clicking the same button again - deselect it
+                button.querySelector('span').classList.remove('bg-opacity-0');
+                button.querySelector('span').classList.add('bg-gray-900');
+                button.classList.remove('selected');
+                currentlySelected = null;
+                document.getElementById('experience_level').value = '';
+            } else {
+                // Clicking a different button
+                if (currentlySelected) {
+                    // Reset the previously selected button
+                    currentlySelected.querySelector('span').classList.remove('bg-opacity-0');
+                    currentlySelected.querySelector('span').classList.add('bg-gray-900');
+                    currentlySelected.classList.remove('selected');
+                }
+                
+                // Select the new button
+                button.querySelector('span').classList.add('bg-opacity-0');
+                button.querySelector('span').classList.remove('bg-gray-900');
+                button.classList.add('selected');
+                currentlySelected = button;
+                document.getElementById('experience_level').value = button.dataset.value;
+            }
+        }
+    </script>
 </section>
