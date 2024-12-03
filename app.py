@@ -5,30 +5,54 @@ from dotenv import load_dotenv
 import os
 import logging
 import markdown2
-
-
+import yaml
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 load_dotenv()
-
 pineconeAPIKey = os.getenv('PINECONE_API_KEY')
+if not pineconeAPIKey:
+    raise ValueError("PINECONE_API_KEY not found in environment variables")
 
 app = Flask(__name__)
 
 pc = Pinecone(api_key=pineconeAPIKey)
 
+# Load prompts from the YAML file
+try:
+    with open('./data/prompts.yaml', 'r') as file:
+        prompts = yaml.safe_load(file)
+except FileNotFoundError:
+    logger.error("prompts.yaml file not found")
+    prompts = {}  # Default empty dict
+
+    
 @app.route('/', methods=['GET', 'POST'])
 def home():
     if request.method == 'POST':
         try:
             question = request.form['message']
+            experience_level = request.form.get('experience_level', 'beginner')
+
+            experience_prefix = prompts.get(experience_level, prompts['beginner'])
+            prompt_prefix = prompts.get('prefix')
+            print(f"Experience level: {experience_level}")
+            print(f"prefix: {experience_prefix}")
+
+            full_question = f"{prompt_prefix} {experience_prefix} {question}"
             
             # Get the assistant
-            assistant = pc.assistant.describe_assistant(
-                assistant_name='devrel-library'
-            )
+            try:
+                assistant = pc.assistant.describe_assistant(
+                    assistant_name='devrel-library'
+                )
+                if not assistant:
+                    raise ValueError("Assistant returned None")
+            except Exception as e:
+                logger.error(f"Failed to initialize assistant: {str(e)}")
+                return render_template('index.html', 
+                                    error="Unable to connect to the assistant service")
 
             # Handle error status codes if they're returned in the response
             if isinstance(assistant, dict) and 'status' in assistant:
@@ -47,14 +71,17 @@ def home():
                                         error="Error accessing the DevRel Assistant.")
 
             # Create message and get response
-            msg = Message(content=question)
+            msg = Message(content=full_question)
             resp = assistant.chat(messages=[msg])
             
             # Extract answer from response
             answer = resp['message']['content']
             
-            html_content = markdown2.markdown(answer, extras=['break-on-newline', 'cuddled-lists'])
-
+            html_content = markdown2.markdown(
+                answer, 
+                extras=['break-on-newline', 'cuddled-lists'],
+                safe_mode='escape'  
+            )
             print(html_content)            
             return render_template('index.html', answer=html_content)
         
@@ -65,11 +92,6 @@ def home():
                                 error="Sorry, there was an error processing your question.")
             
     return render_template('index.html')
-
-@app.route('/answer')
-def answer():
-    question = request.form['message']
-    return render_template('answer.html')
 
 @app.route('/test')
 def test():

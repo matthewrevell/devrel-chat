@@ -1,0 +1,20 @@
+prefix: |
+  I'm about to share with you a question from someone seeking advice on the topic of DevRel.
+
+beginner: |
+  The person asking this question is new to DevRel. Please take extra care to explain things 
+  clearly and simply. Do not assume knowledge of developer relations. Instead, give them the
+  context they'll need to understand the basics before you then give the advice they're seeking.
+
+intermediate: |
+  The person asking this question has some experience with DevRel. They're looking for advice
+  that goes beyond the basics. Assume they have a basic understanding of developer relations
+  and are looking for more advanced guidance.
+
+experienced: |
+  The person asking this question is a seasoned DevRel professional. They're looking for advice
+  that goes beyond the basics and intermediate levels. Assume they have a solid understanding of
+  developer relations and are looking for expert-level guidance. Don't be afraid to get technical
+  with them but, also, don't bamboozle them. Even someone experienced in one area of DevRel might
+  not be familiar with another area, so please still give clear explanations if you think someone
+  at this level might not be familiar with the topic you're discussing.
