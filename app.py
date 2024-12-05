@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request
 from pinecone import Pinecone
 from pinecone_plugins.assistant.models.chat import Message
 from dotenv import load_dotenv
@@ -6,70 +6,72 @@ import os
 import logging
 import markdown2
 
-
-
+# Set up logging and send logs to the console
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Load the Pinecone API key from the environment
+# and raise an error if it's not set
 load_dotenv()
-
 pineconeAPIKey = os.getenv('PINECONE_API_KEY')
+if not pineconeAPIKey:
+    raise ValueError("PINECONE_API_KEY environment variable is not set")
 
 app = Flask(__name__)
 
+# Initialise the Pinecone client
 pc = Pinecone(api_key=pineconeAPIKey)
 
+# Define the home route
+# The GET method renders the page with or without the response
+# The POST method sends the question to the assistant
 @app.route('/', methods=['GET', 'POST'])
 def home():
     if request.method == 'POST':
+        # Check that the form data contains a message
+        if 'message' not in request.form:
+            logger.error("No message provided in form data")
+            return render_template('index.html', 
+                                error="Please provide a question.")
+        
+        # Check that the message is not empty
+        question = request.form['message']
+        if not question.strip():
+            logger.warning("Empty message submitted")
+            return render_template('index.html', 
+                                error="Please enter a question.")
+
         try:
-            question = request.form['message']
-            
-            # Get the assistant
+            # Initialise the connection to the assistant in Pinceone
             assistant = pc.assistant.describe_assistant(
                 assistant_name='devrel-library'
             )
-
-            # Handle error status codes if they're returned in the response
-            if isinstance(assistant, dict) and 'status' in assistant:
-                status = assistant.get('status')
-                if status == 401:
-                    logger.warning(f"Unauthorized access attempt: {assistant}")
-                    return render_template('index.html', 
-                                        error="Unauthorized access to the DevRel Assistant.")
-                elif status == 404:
-                    logger.warning(f"Assistant not found: {assistant}")
-                    return render_template('index.html', 
-                                        error="DevRel Assistant not found.")
-                elif status != 200:
-                    logger.error(f"Unexpected response status {status}: {assistant}")
-                    return render_template('index.html', 
-                                        error="Error accessing the DevRel Assistant.")
-
-            # Create message and get response
+            
+            # Create message object from user's question
             msg = Message(content=question)
+            # Send message to assistant and get response
             resp = assistant.chat(messages=[msg])
             
-            # Extract answer from response
+            # Just try to access the content directly
             answer = resp['message']['content']
-            
-            html_content = markdown2.markdown(answer, extras=['break-on-newline', 'cuddled-lists'])
-
-            print(html_content)            
+            try:
+                html_content = markdown2.markdown(answer, extras=['break-on-newline', 'cuddled-lists'])
+            except:
+                html_content = answer  # Just use the raw text if markdown fails
+                
             return render_template('index.html', answer=html_content)
-        
 
         except Exception as e:
-            logger.error(f"Error processing question: {str(e)}")
-            return render_template('index.html', 
-                                error="Sorry, there was an error processing your question.")
-            
+            if "connection" in str(e).lower():  # Check if it's connection-related
+                logger.error(f"Connection error reaching Pinecone: {str(e)}")
+                return render_template('index.html', 
+                                    error="Unable to connect to the assistant service. Please try again later.")
+            else:
+                logger.error(f"Unexpected error: {str(e)}")
+                return render_template('index.html', 
+                                    error="An unexpected error occurred. Please try again later.")
+    
     return render_template('index.html')
-
-@app.route('/answer')
-def answer():
-    question = request.form['message']
-    return render_template('answer.html')
 
 @app.route('/test')
 def test():

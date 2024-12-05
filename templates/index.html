@@ -2,6 +2,10 @@
 
 {% block content %}
     {% include './components/ask-form.html' %}
+
+    {% if error %}
+        {% include './components/error-box.html' %}
+    {% endif %}
     
     {% if answer %}
         {% include './components/answer-section.html' %}
