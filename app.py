@@ -6,6 +6,7 @@ import os
 import logging
 import markdown2
 
+
 # Set up logging and send logs to the console
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -28,6 +29,8 @@ pc = Pinecone(api_key=pineconeAPIKey)
 @app.route('/', methods=['GET', 'POST'])
 def home():
     if request.method == 'POST':
+        assistant_to_use = 'devrel-library'
+
         # Check that the form data contains a message
         if 'message' not in request.form:
             logger.error("No message provided in form data")
@@ -42,23 +45,31 @@ def home():
                                 error="Please enter a question.")
 
         try:
-            # Initialise the connection to the assistant in Pinceone
             assistant = pc.assistant.describe_assistant(
-                assistant_name='devrel-library'
+                assistant_name=assistant_to_use
             )
-            
-            # Create message object from user's question
+        except Exception as assistant_error:
+            logger.error(f"Failed to find assistant '{assistant_to_use}': {str(assistant_error)}")
+            return render_template('index.html', 
+                                error="Assistant not found. Please check the configuration.")
+
+        try:
+            # Create a message object from the user's question
             msg = Message(content=question)
-            # Send message to assistant and get response
+
+            # Send the message to Pinecone Assistant and get a response
             resp = assistant.chat(messages=[msg])
-            
-            # Just try to access the content directly
+                
+            # Reformat the response as HTML that we can display in the 
+            # Flask template
             answer = resp['message']['content']
             try:
                 html_content = markdown2.markdown(answer, extras=['break-on-newline', 'cuddled-lists'])
             except:
                 html_content = answer  # Just use the raw text if markdown fails
-                
+                logger.error("Markdown conversion failed, using raw text")
+                    
+            # Send the HTML response to the Flask template and render it
             return render_template('index.html', answer=html_content)
 
         except Exception as e:
@@ -73,6 +84,10 @@ def home():
     
     return render_template('index.html')
 
+
+
+# A test route to display a static answer for checking UI
+# without hitting the API
 @app.route('/test')
 def test():
     static_answer = """<p>Sure, here is a numbered list of content tips based on the provided snippets:</p>
