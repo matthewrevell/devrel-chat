@@ -8,7 +8,8 @@ document.addEventListener('DOMContentLoaded', function() {
     errorMessage.className = 'mt-4 flex items-start gap-3 p-4 mb-4 text-sm rounded-lg border bg-gray-800 hidden';
     errorMessage.setAttribute('role', 'alert');
     
-    // Set styles directly
+    // Had trouble applying Tailwind color classes to the alert box
+    // so this is a temprorary solution to force it to be red
     errorMessage.style.color = 'rgb(248 113 113)';
     errorMessage.style.borderColor = 'rgb(248 113 113)';
     
@@ -28,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     textarea.parentNode.appendChild(errorMessage);
     
-    // Add keyframe animation
+    // Add keyframe animation for the progress bar
     const style = document.createElement('style');
     style.textContent = `
         @keyframes loading {
@@ -45,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
         progressBar.classList.add('hidden');
     }
     
-    // Function to handle form submission
+    // Handle form submission
     function handleSubmit(e) {
         if (!textarea.value.trim()) {
             e.preventDefault();
@@ -56,9 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 3000);
             
             return false;
-        }
-
-        
+        }    
         
         // Show progress bar and submit form
         progressBar.classList.remove('hidden');
@@ -66,7 +65,8 @@ document.addEventListener('DOMContentLoaded', function() {
         return true;
     }
     
-    // Handle Enter key
+    // Submit the form if the person hits Enter
+    // Provide a new line if they hit Shift+Enter
     textarea.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') {
             if (e.shiftKey) {
@@ -80,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Handle form submit (button click)
+    // Submit the form if the person clicks the submit button
     form.addEventListener('submit', function(e) {
         handleSubmit(e);
     });
